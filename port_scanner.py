@@ -6,6 +6,29 @@ import argparse
 
 # Expressão Regular para endereços IPV4
 ipv4_regex = r'^((25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$'
+ipv6_regex = re.compile(
+    r'('
+    r'(([0-9a-fA-F]{1,4}:){7}([0-9a-fA-F]{1,4}|:))|'
+    r'(([0-9a-fA-F]{1,4}:){1,7}:)|'
+    r'(([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4})|'
+    r'(([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2})|'
+    r'(([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3})|'
+    r'(([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4})|'
+    r'(([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5})|'
+    r'([0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6}))|'
+    r'(:(:[0-9a-fA-F]{1,4}){1,7}|:)|'
+    r'fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|'
+    r'::(ffff(:0{1,4}){0,1}:){0,1}'
+    r'(([0-9]{1,3}\.){3}[0-9]{1,3})|'
+    r'([0-9a-fA-F]{1,4}:){1,4}:([0-9]{1,3}\.){3}[0-9]{1,3}'
+    r')'
+)
+
+# Funções de validação
+def valid_ipv6(ip):
+    if ipv6_regex.match(ip):
+        return True
+    return False
 
 def valid_ipv4(ip):
     return re.match(ipv4_regex, ip) is not None
@@ -53,22 +76,26 @@ def main():
     services = parse_services_file()
 
     # Criação do parser de argumentos
-    parser = argparse.ArgumentParser(description="Exemplo de programa com argumentos no formato p_start:p_stop ou apenas p_start")
+    parser = argparse.ArgumentParser(description="Script for port scanning")
     
     # Argumento para endereço de IP (obrigatório)
-    parser.add_argument('ip', type=str, help="Endereço de IP (obrigatório)")
+    parser.add_argument('ip', type=str, help="IP Address")
     
     # Definindo o argumento -p como opcional, permitindo que receba algo no formato p_start ou p_start:p_stop
-    parser.add_argument('-p', type=str, nargs='?', help="Argumento no formato p_start ou p_start:p_stop", default='')
+    parser.add_argument('-p', type=str, nargs='?', help=" port range <p_start:p_stop> <p_start> [default: 1:65535]", default='1:65535')
 
     # Parseando os argumentos
     args = parser.parse_args()
 
     # Validando o endereço de IP
-    if(valid_ipv4(args.ip) is not True):
+    if(valid_ipv4(args.ip) is not True and valid_ipv6(args.ip) is not True):
         print(f"The ip address {args.ip} is not a valid ip address")
         return
-    
+    elif(valid_ipv4(args.ip)):
+        socket_type = socket.AF_INET
+    else:
+        socket_type = socket.AF_INET6
+
     # Parseando os argumentos
     ports = args.p
 
@@ -81,13 +108,10 @@ def main():
         else:
             p_start = int (ports)
             p_stop = 65535 # Atribuindo valor default ao segundo argumento
-    else:
-        p_start = 1 # Atribuindo valor default ao primeiro argumento
-        p_stop = 65535 # Atribuindo valor default ao segundo argumento
 
     print(f"Port\tProtocol\tStatus")
     for port in range(p_start, p_stop+1):
-        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client = socket.socket(socket_type, socket.SOCK_STREAM)
         client.settimeout(0.1)
         code = client.connect_ex((args.ip, port))
         if code == 0:
