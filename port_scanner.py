@@ -3,6 +3,7 @@
 import socket
 import re
 import argparse
+import copy
 
 # Expressão Regular para endereços IPV4
 ipv4_regex = r'^((25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$'
@@ -109,15 +110,20 @@ def main():
             p_start = int (ports)
             p_stop = 65535 # Atribuindo valor default ao segundo argumento
 
-    print(f"Port\tProtocol\tStatus")
+    print(f"Port\tProtocol\tStatus\tService")
     for port in range(p_start, p_stop+1):
         client = socket.socket(socket_type, socket.SOCK_STREAM)
         client.settimeout(0.1)
         code = client.connect_ex((args.ip, port))
         if code == 0:
-            for service in services:
+            for service_index, service in enumerate(services):
                 if(port == service.port):
-                    print(f"{service.port}\t{service.protocol}\topen")
+                    print(f"{service.port}\t{service.protocol}\t\topen\t{service.name}")
+                    break
+                if(service_index == len(services)): # Se service_index == len(services) -> True é porque se trata da última iteração e o serviço n foi encontrao
+                    print(f"{service.port}\t{service.protocol}\t\topen\tunknown")
 
+                    
+                
 if __name__ == "__main__":
     main()
