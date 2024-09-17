@@ -90,9 +90,10 @@ Exemplo de execução:
 
 ```bash
 $ portscanner 127.0.0.1
-Port    Protocol        Status
-80      tcp             open
-5432    tcp             open
+Port    Protocol        Status  Service
+80      tcp             open    http
+631     tcp             open    ipp
+5432    tcp             open    postgresql
 ```
 
 ## Licença
