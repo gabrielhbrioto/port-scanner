@@ -86,14 +86,33 @@ make clean
 
 O script requer um endereço IP como argumento que pode estar tanto no formato IPv4, quanto IPv6, além de aceitar como argumento um range de portas a serem escaneadas, ou apenas a porta inicial. Caso não sejam especificadas quais portas devem ser escaneadas, o algoritmo realizará o escaneamento da porta 1 à 65535.
 
-Exemplo de execução:
+Exemplo de execução utilizando como alvo a máquina metasploitable:
 
 ```bash
-$ portscanner 127.0.0.1
+$ portscanner 192.168.1.4
 Port    Protocol        Status  Service
+21      tcp             open    ftp
+22      tcp             open    ssh
+23      tcp             open    telnet
+25      tcp             open    smtp
+53      tcp             open    domain
 80      tcp             open    http
-631     tcp             open    ipp
+111     tcp             open    sunrpc
+139     tcp             open    netbios-ssn
+445     tcp             open    microsoft-ds
+512     tcp             open    exec
+513     tcp             open    login
+514     tcp             open    shell
+1099    tcp             open    rmiregistry
+1524    tcp             open    ingreslock
+2049    tcp             open    nfs
+2121    tcp             open    iprop
+3306    tcp             open    mysql
+3632    tcp             open    distcc
 5432    tcp             open    postgresql
+6000    tcp             open    x11
+6667    tcp             open    ircd
+6697    tcp             open    ircs-u
 ```
 
 ## Licença

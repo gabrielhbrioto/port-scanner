@@ -3,7 +3,6 @@
 import socket
 import re
 import argparse
-import copy
 
 # Expressão Regular para endereços IPV4
 ipv4_regex = r'^((25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$'
