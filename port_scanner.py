@@ -3,6 +3,12 @@
 import socket
 import re
 import argparse
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+socket_type = None
+ip_address = None
+services = []
 
 # Expressão Regular para endereços IPV4
 ipv4_regex = r'^((25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$'
@@ -44,7 +50,7 @@ class ServiceEntry:
 
 
 def parse_services_file(file_path='/etc/services'):
-    services = []
+    global services
 
     with open(file_path, 'r') as file:
         for line in file:
@@ -70,7 +76,20 @@ def parse_services_file(file_path='/etc/services'):
 
     return services
 
+def scan_port(port):
+    client = socket.socket(socket_type, socket.SOCK_STREAM)
+    client.settimeout(0.1)
+    code = client.connect_ex((ip_address, port))
+    if code == 0:
+        for service_index, service in enumerate(services):
+            if port == service.port:
+                return f"{service.port}\{service.protocol}\t\topen\t{service.name}"
+        return f"{port}\{service.protocol}\topen\tunknown"
+    return None
+
 def main():
+    global socket_type
+    global ip_address
 
     # Lendo e tratando o conteúdo do arquivo /etc/services
     services = parse_services_file()
@@ -82,10 +101,14 @@ def main():
     parser.add_argument('ip', type=str, help="IP Address")
     
     # Definindo o argumento -p como opcional, permitindo que receba algo no formato p_start ou p_start:p_stop
-    parser.add_argument('-p', type=str, nargs='?', help=" port range <p_start:p_stop> <p_start> [default: 1:65535]", default='1:65535')
+    parser.add_argument('-p', type=str, nargs='?', help="Port range <p_start:p_stop> <p_start> [default: 1:65535]", default='1:65535')
 
+    # Flag opcional --parallelize para ativar o escaneamento em paralelo
+    parser.add_argument('--parallelize', action='store_true', help="Enable parallel scanning")
+    
     # Parseando os argumentos
     args = parser.parse_args()
+    ip_address = args.ip
 
     # Validando o endereço de IP
     if(valid_ipv4(args.ip) is not True and valid_ipv6(args.ip) is not True):
@@ -96,7 +119,7 @@ def main():
     else:
         socket_type = socket.AF_INET6
 
-    # Parseando os argumentos
+    # Parseando as portas
     ports = args.p
 
     # Verificando o valor passado para -p
@@ -109,20 +132,29 @@ def main():
             p_start = int (ports)
             p_stop = 65535 # Atribuindo valor default ao segundo argumento
 
-    print(f"Port\tProtocol\tStatus\tService")
-    for port in range(p_start, p_stop+1):
-        client = socket.socket(socket_type, socket.SOCK_STREAM)
-        client.settimeout(0.1)
-        code = client.connect_ex((args.ip, port))
-        if code == 0:
-            for service_index, service in enumerate(services):
-                if(port == service.port):
-                    print(f"{service.port}\t{service.protocol}\t\topen\t{service.name}")
-                    break
-                if(service_index == len(services)): # Se service_index == len(services) -> True é porque se trata da última iteração e o serviço n foi encontrao
-                    print(f"{service.port}\t{service.protocol}\t\topen\tunknown")
+    # Salvando instante inicial do escaneamento de portas
+    init_time = time.time()
 
-                    
+    # Impressão do cabeçalho da saída
+    print(f"Port\t\tStatus\tService")
+
+    # Escaneamento paralelo
+    if args.parallelize:
+        with ThreadPoolExecutor() as executor:
+            futures = [executor.submit(scan_port, port) for port in range(p_start, p_stop+1)]
+            for future in as_completed(futures):
+                result = future.result()
+                if result:
+                    print(result)
+    
+    # Loop de escaneamento sequencial
+    else:
+        for port in range(p_start, p_stop+1):
+                result = scan_port(port)
+                if result:
+                    print(result)
+    
+    print(f"{p_stop-p_start+1} portas escaneadas em {(time.time()-init_time):.3f} segundos")
                 
 if __name__ == "__main__":
     main()
