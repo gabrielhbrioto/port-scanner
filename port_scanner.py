@@ -87,6 +87,24 @@ def scan_port(port):
         return f"{port}\{service.protocol}\topen\tunknown"
     return None
 
+def dns_lookup(hostname):
+    try:
+        # Para IPv4 e IPv6
+        addr_info = socket.getaddrinfo(hostname, None)
+        # Filtra os endereços IPv4 e IPv6
+        ipv4_address = None
+        ipv6_address = None
+        for info in addr_info:
+            family, _, _, _, sockaddr = info
+            if family == socket.AF_INET:  # IPv4
+                ipv4_address = sockaddr[0]
+            elif family == socket.AF_INET6:  # IPv6
+                ipv6_address = sockaddr[0]
+        
+        return ipv4_address, ipv6_address
+    except socket.gaierror:
+        return None, None
+
 def main():
     global socket_type
     global ip_address
@@ -108,16 +126,20 @@ def main():
     
     # Parseando os argumentos
     args = parser.parse_args()
-    ip_address = args.ip
+
+    # Resolvendo o hostname para IPv4 e IPv6, se for um domínio
+    ipv4_address, ipv6_address = dns_lookup(args.ip)
 
     # Validando o endereço de IP
-    if(valid_ipv4(args.ip) is not True and valid_ipv6(args.ip) is not True):
-        print(f"The ip address {args.ip} is not a valid ip address")
-        return
-    elif(valid_ipv4(args.ip)):
+    if valid_ipv4(args.ip) or ipv4_address:
         socket_type = socket.AF_INET
-    else:
+        ip_address = ipv4_address if ipv4_address else args.ip
+    elif valid_ipv6(args.ip) or ipv6_address:
         socket_type = socket.AF_INET6
+        ip_address = ipv6_address if ipv6_address else args.ip
+    else:
+        print(f"\033[31mError:\033[0m Failed to resolve \"{args.ip}\"")
+        return
 
     # Parseando as portas
     ports = args.p
@@ -154,7 +176,7 @@ def main():
                 if result:
                     print(result)
     
-    print(f"{p_stop-p_start+1} portas escaneadas em {(time.time()-init_time):.3f} segundos")
+    print(f"{p_stop-p_start+1} ports scanned in {(time.time()-init_time):.3f} seconds")
                 
 if __name__ == "__main__":
     main()

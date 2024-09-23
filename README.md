@@ -1,6 +1,6 @@
 # Port Scanner
 
-Este projeto é um scanner de portas TCP desenvolvido em Python, que permite escanear portas abertas em um endereço IP utilizando tanto IPv4 quanto IPv6. O script utiliza a biblioteca socket para realizar conexões TCP, identificando quais portas estão abertas em um determinado endereço.
+Este projeto é um scanner de portas TCP desenvolvido em Python, que permite escanear portas abertas em um endereço IP utilizando tanto IPv4 quanto IPv6, ou ainda um domínio. O script utiliza a biblioteca socket para realizar conexões TCP, identificando quais portas estão abertas em um determinado endereço.
 
 - [Descrição](#descrição)
 - [Funcionalidades](#funcionalidades)
@@ -9,20 +9,22 @@ Este projeto é um scanner de portas TCP desenvolvido em Python, que permite esc
 - [Execução](#execução)
 - [Uso](#uso)
 - [Licença](#licença)
+
 ## Descrição
-Este é um simples scanner de portas desenvolvido em Python que permite verificar o status de portas em endereços IP IPv4 e IPv6. O script permite a verificação em redes locais ou remotas, identificando quais portas estão abertas para conexões TCP. Além disso, o projeto utiliza ambientes virtuais para a organização das dependências e fornece uma maneira de instalação global para facilitar sua execução.
+Este é um simples scanner de portas desenvolvido em Python que permite verificar o status de portas em endereços IP IPv4 e IPv6. O script permite a verificação em redes locais ou remotas, identificando quais portas estão abertas para conexões TCP. Ele ainda oferece suporte DNS, permitindo ao usuário digitar o domínio que deseja escanear e resolvendo-o para um endereço de IP válido. Além disso, o projeto utiliza ambientes virtuais para a organização das dependências e fornece uma maneira de instalação global para facilitar sua execução.
 
 ## Funcionalidades
 - Suporte a endereços IPv4 e IPv6.
+- Suporte a DNS
 - Validação de endereços IP.
 - Verificação de portas abertas.
 - Uso opcional de ambiente virtual para gerenciamento de dependências.
-- Instalação fácil do script no sistema com um link simbólico.
+- Instalação simples do script no sistema com um link simbólico.
 
 ## Dependências
 Certifique-se de ter as seguintes dependências instaladas:
-- Python 3.6 ou superior.
-- `virtualenv` (gerenciamento de ambiente virtual).
+- `Python 3.6` ou superior.
+- `virtualenv` (gerenciamento de ambiente virtual do Python).
 
 ## Instalação
 
@@ -40,12 +42,12 @@ Certifique-se de ter as seguintes dependências instaladas:
 
 Após concluída a instalação, você pode executar o scanner de portas com o seguinte comando:
 ```bash
-portscanner <endereço IP>
+portscanner <endereço IP/hostname>
 ```
 Ou, se desejar, especificar o range de portas a serem scaneadas:
 
 ```bash
-portscanner <endereço IP> -p <porta_inicial:porta_final>
+portscanner <endereço IP/hostname> -p <porta_inicial:porta_final>
 ```
 
 2. Executando o script sem instalação prévia
@@ -53,7 +55,7 @@ portscanner <endereço IP> -p <porta_inicial:porta_final>
 Caso não seja do seu interesse criar o link simbólico para a execução do script, basta utilizar a diretiva `run` do `Makefile` fornecendo o ip da máquina alvo para escanear todas as portas:
 
 ```bash
-make run ARGS="<endereço IP>"
+make run ARGS="<endereço IP/hostname>"
 ```
 
 Ou ainda para especificar o range de portas:
