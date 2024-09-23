@@ -116,7 +116,7 @@ def main():
     parser = argparse.ArgumentParser(description="Script for port scanning")
     
     # Argumento para endereço de IP (obrigatório)
-    parser.add_argument('ip', type=str, help="IP Address")
+    parser.add_argument('target', type=str, help="IP Address or hostname")
     
     # Definindo o argumento -p como opcional, permitindo que receba algo no formato p_start ou p_start:p_stop
     parser.add_argument('-p', type=str, nargs='?', help="Port range <p_start:p_stop> <p_start> [default: 1:65535]", default='1:65535')
@@ -128,17 +128,17 @@ def main():
     args = parser.parse_args()
 
     # Resolvendo o hostname para IPv4 e IPv6, se for um domínio
-    ipv4_address, ipv6_address = dns_lookup(args.ip)
+    ipv4_address, ipv6_address = dns_lookup(args.target)
 
     # Validando o endereço de IP
-    if valid_ipv4(args.ip) or ipv4_address:
+    if valid_ipv4(args.target) or ipv4_address:
         socket_type = socket.AF_INET
-        ip_address = ipv4_address if ipv4_address else args.ip
-    elif valid_ipv6(args.ip) or ipv6_address:
+        ip_address = ipv4_address if ipv4_address else args.target
+    elif valid_ipv6(args.target) or ipv6_address:
         socket_type = socket.AF_INET6
-        ip_address = ipv6_address if ipv6_address else args.ip
+        ip_address = ipv6_address if ipv6_address else args.target
     else:
-        print(f"\033[31mError:\033[0m Failed to resolve \"{args.ip}\"")
+        print(f"\033[31mError:\033[0m Failed to resolve \"{args.target}\"")
         return
 
     # Parseando as portas
