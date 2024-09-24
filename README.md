@@ -23,8 +23,10 @@ Este é um simples scanner de portas desenvolvido em Python que permite verifica
 
 ## Dependências
 Certifique-se de ter as seguintes dependências instaladas:
-- `Python 3.6` ou superior.
-- `virtualenv` (gerenciamento de ambiente virtual do Python).
+- `Python v3.8.10` 
+- `GCC v9.4.0` 
+- `virtualenv v20.25.3` 
+- `Ubuntu v20.04 LTS` 
 
 ## Instalação
 
