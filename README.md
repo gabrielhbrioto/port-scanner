@@ -42,12 +42,12 @@ Certifique-se de ter as seguintes dependências instaladas:
 
 Após concluída a instalação, você pode executar o scanner de portas com o seguinte comando:
 ```bash
-portscanner <endereço IP/hostname>
+portscanner <alvo>
 ```
 Ou, se desejar, especificar o range de portas a serem scaneadas:
 
 ```bash
-portscanner <endereço IP/hostname> -p <porta_inicial:porta_final>
+portscanner <alvo> -p <porta_inicial:porta_final>
 ```
 
 2. Executando o script sem instalação prévia
@@ -55,13 +55,13 @@ portscanner <endereço IP/hostname> -p <porta_inicial:porta_final>
 Caso não seja do seu interesse criar o link simbólico para a execução do script, basta utilizar a diretiva `run` do `Makefile` fornecendo o ip da máquina alvo para escanear todas as portas:
 
 ```bash
-make run ARGS="<endereço IP/hostname>"
+make run ARGS="<alvo>"
 ```
 
 Ou ainda para especificar o range de portas:
 
 ```bash
-make run ARGS="<endereço IP> -p <porta_inicial:porta_final>"
+make run ARGS="<alvo> -p <porta_inicial:porta_final>"
 ```
 
 3. Executando dentro do ambiente virtual
@@ -92,29 +92,38 @@ Exemplo de execução utilizando como alvo a máquina metasploitable:
 
 ```bash
 $ portscanner 192.168.1.4
-Port    Protocol        Status  Service
-21      tcp             open    ftp
-22      tcp             open    ssh
-23      tcp             open    telnet
-25      tcp             open    smtp
-53      tcp             open    domain
-80      tcp             open    http
-111     tcp             open    sunrpc
-139     tcp             open    netbios-ssn
-445     tcp             open    microsoft-ds
-512     tcp             open    exec
-513     tcp             open    login
-514     tcp             open    shell
-1099    tcp             open    rmiregistry
-1524    tcp             open    ingreslock
-2049    tcp             open    nfs
-2121    tcp             open    iprop
-3306    tcp             open    mysql
-3632    tcp             open    distcc
-5432    tcp             open    postgresql
-6000    tcp             open    x11
-6667    tcp             open    ircd
-6697    tcp             open    ircs-u
+Port            Status  Service
+21\tcp          open    ftp
+22\tcp          open    ssh
+23\tcp          open    telnet
+25\tcp          open    smtp
+53\tcp          open    domain
+80\tcp          open    http
+111\tcp         open    sunrpc
+139\tcp         open    netbios-ssn
+445\tcp         open    microsoft-ds
+512\tcp         open    exec
+513\tcp         open    login
+514\tcp         open    shell
+1099\tcp        open    rmiregistry
+1524\tcp        open    ingreslock
+2049\tcp        open    nfs
+2121\tcp        open    iprop
+3306\tcp        open    mysql
+3632\tcp        open    distcc
+5432\tcp        open    postgresql
+5900\tcp        open    unknown
+6000\tcp        open    x11
+6667\tcp        open    ircd
+6697\tcp        open    ircs-u
+8009\tcp        open    unknown
+8180\tcp        open    unknown
+8787\tcp        open    unknown
+33291\tcp       open    unknown
+34647\tcp       open    unknown
+54968\tcp       open    unknown
+55049\tcp       open    unknown
+65535 ports scanned in 12.674 seconds
 ```
 
 ## Licença

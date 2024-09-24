@@ -10,6 +10,11 @@ socket_type = None
 ip_address = None
 services = []
 
+# Definir o espaçamento padrão
+port_proto_col_width = 12  # Largura da coluna para porta/protocolo
+status_col_width = 8  # Largura da coluna para o status
+service_col_width = 15  # Largura da coluna para serviços
+
 # Expressão Regular para endereços IPV4
 ipv4_regex = r'^((25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$'
 ipv6_regex = re.compile(
@@ -80,11 +85,16 @@ def scan_port(port):
     client = socket.socket(socket_type, socket.SOCK_STREAM)
     client.settimeout(0.1)
     code = client.connect_ex((ip_address, port))
+    
+    global port_proto_col_width 
+    global status_col_width 
+    global service_col_width 
+    
     if code == 0:
-        for service_index, service in enumerate(services):
+        for service in services:
             if port == service.port:
-                return f"{service.port}\{service.protocol}\t\topen\t{service.name}"
-        return f"{port}\{service.protocol}\topen\tunknown"
+                return f"{str(service.port)}/tcp".ljust(port_proto_col_width) + f"{'open'.ljust(status_col_width)}" + f"{service.name.ljust(service_col_width)}"
+        return f"{str(port)}/tcp".ljust(port_proto_col_width) + f"{'open'.ljust(status_col_width)}" + f"{'unknown'.ljust(service_col_width)}"
     return None
 
 def dns_lookup(hostname):
@@ -158,7 +168,8 @@ def main():
     init_time = time.time()
 
     # Impressão do cabeçalho da saída
-    print(f"Port\t\tStatus\tService")
+    print("Port".ljust(port_proto_col_width) + "Status".ljust(status_col_width) + "Service".ljust(service_col_width))
+    
 
     # Escaneamento paralelo
     if args.parallelize:
